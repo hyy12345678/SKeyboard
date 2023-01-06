@@ -3,6 +3,7 @@ package net.hyy.fun.skeyboard;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -16,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
 //        System.loadLibrary("native-lib");
 //    }
 
+    private static final String TAG = "MainActivity";
 
 
     TextView sample_text;
@@ -91,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String encryptStr = NativeHelper.getEncryptKeyDES(DUMMY_ID,DES_KEY,"");
                 sample_text.setText(encryptStr);
+                Log.e(TAG,encryptStr);
             }
         });
 

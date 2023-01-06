@@ -211,14 +211,21 @@ Java_net_hyy_fun_skeyboardlib_NativeHelper_getEncryptKey(JNIEnv *env, jclass typ
     // TODO
     string input = hashmap.HMFind(jstring2str(env, id_));
 
-    MD5 md5 = MD5(input);
-    string md5Result = md5.hexdigest();
+    string md5Result;
+    if(input.empty()){
+        md5Result = "";
+    }else{
+        MD5 md5 = MD5(input);
+        md5Result = md5.hexdigest();
+    }
 
     //将char *类型转化成jstring返回给Java层
     return env->NewStringUTF(md5Result.c_str());
 
 
-}extern "C"
+}
+
+extern "C"
 JNIEXPORT jstring JNICALL
 Java_net_hyy_fun_skeyboardlib_NativeHelper_getDecryptKey(JNIEnv *env, jclass type, jstring id_,
                                                          jstring timestamp_) {
@@ -238,7 +245,14 @@ Java_net_hyy_fun_skeyboardlib_NativeHelper_getEncryptKeyDES(JNIEnv *env, jclass 
     const char *timestamp = env->GetStringUTFChars(timestamp_, 0);
 
     // TODO
-    jstring result;
+    if(hashmap.HMFind(id).empty()){
+        env->ReleaseStringUTFChars(id_, id);
+        env->ReleaseStringUTFChars(key_, key);
+        env->ReleaseStringUTFChars(timestamp_, timestamp);
+        return env->NewStringUTF("");
+    }
+
+
     const char* content = hashmap.HMFind(id).c_str();
 
     //1、获取字节码
@@ -258,6 +272,7 @@ Java_net_hyy_fun_skeyboardlib_NativeHelper_getEncryptKeyDES(JNIEnv *env, jclass 
     jstring str_arg1 = env->NewStringUTF(content);
     jstring str_arg2 = env->NewStringUTF(key);
 
+    jstring result;
     result = (jstring) env->CallStaticObjectMethod(jclazz, jmethodId, str_arg1, str_arg2);
 
     const char *result_str = env->GetStringUTFChars(result, NULL);

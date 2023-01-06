@@ -91,7 +91,7 @@ public class SafeKeyboard {
         delDrawable = mContext.getResources().getDrawable(R.drawable.seckey_icon_del);
         lowDrawable = mContext.getResources().getDrawable(R.drawable.seckey_icon_capital_default);
         upDrawable = mContext.getResources().getDrawable(R.drawable.seckey_icon_capital_selected);
-        logoDrawable = mContext.getResources().getDrawable(R.drawable.seckey_logo_zy);
+        logoDrawable = mContext.getResources().getDrawable(R.drawable.seckey_logo_anquan);
         downDrawable = mContext.getResources().getDrawable(R.drawable.seckey_keyboard_done_);
         initKeyboard();
         initAnimation();
