@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="seckey_white">#FFFFFF</color>
+    <color name="seckey_black">#000000</color>
+    <color name="seckey_deepDark">#A9A9A9</color>
+    <color name="seckey_transparent">#00000000</color>
+    <color name="seckey_keyboardBackColor">#D3D3D3</color>
+    <color name="seckey_keyboardKeyBack">#474749</color>
+    <color name="seckey_darkGray">#A9A9A9</color>
+    <color name="seckey_lightGray">#D3D3D3</color>
+    <color name="seckey_keyboardNormal">#A9A9A9</color>
+    <color name="seckey_keyboardDeep">#A9A9A9</color>
+    <color name="seckey_keyboardPress">#A9A9A9</color>
+    <color name="seckey_colorRed">#FF0000</color>
+</resources>

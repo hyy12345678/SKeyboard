@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/seckey_keyboardBackColor"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/keyboardHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/seckey_keyboardBackColor">
+
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="安全键盘"
+            android:textColor="@color/seckey_white"
+            android:gravity="center"
+            android:drawablePadding="2dp"
+            android:drawableLeft="@drawable/seckey_google"/>
+
+        <ImageView
+            android:id="@+id/keyboardDone"
+            android:layout_width="30sp"
+            android:layout_height="30sp"
+            android:layout_alignParentRight="true"
+            android:contentDescription="@null"
+            android:layout_centerVertical="true"
+            android:scaleType="centerInside"
+            android:src="@drawable/seckey_keyboard_done_"
+            android:textColor="@color/seckey_white"
+            android:layout_marginRight="10dp" />
+    </RelativeLayout>
+
+
+    <FrameLayout
+        android:id="@+id/keyboardLayer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10sp"
+        android:layout_marginTop="2sp">
+
+        <net.hyy.fun.skeyboardlib.SafeKeyboardView
+            android:id="@+id/safeKeyboardLetter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:background="@color/seckey_keyboardBackColor"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:keyBackground="@drawable/seckey_keyboard_press_bg"
+            android:keyPreviewHeight="60dp"
+            android:keyPreviewLayout="@layout/seckey_keyboard_preview_layout"
+            android:keyPreviewOffset="0dp"
+            android:keyTextColor="@color/seckey_black" />
+
+    </FrameLayout>
+</LinearLayout>

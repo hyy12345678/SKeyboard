@@ -1,0 +1,13 @@
+<resources>
+    <string name="seckey_description">SafeKeyboard</string>
+    <string name="seckey_safe_keyboard">中邮消费金融安全软键盘</string>
+    <string name="seckey_keyboard_key1">"&#64;"</string>
+    <string name="seckey_keyboard_key2">"&#38;"</string>
+    <string name="seckey_keyboard_key3">\"</string>
+    <string name="seckey_keyboard_key4">"&#60;"</string>
+    <string name="seckey_keyboard_key5">"&#62;"</string>
+    <!--<string name="keyboard_system">"系统键盘"</string>-->
+    <!--<string name="keyboard_demo_new">"安全软键盘"</string>-->
+    <string name="seckey_mLabelTextSize">mLabelTextSize</string>
+    <string name="seckey_zeroTonine">1234567890</string>
+</resources>

@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SKeyboard</string>
+    <string name="keyboard_system">"系统键盘"</string>
+    <string name="keyboard_demo_new">"安全软键盘"</string>
+</resources>
