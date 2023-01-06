@@ -1,5 +1,5 @@
 # **SKeyboard**
-Android自定义安全软键盘，jni方式MD5,DES存储加密(原理上可以扩展各种java层各种存储加密)，ui支持可扩展，使用方便简单安全，防录制，去除内容回显等。
+Android自定义安全软键盘，jni方式MD5,DES(DES/ECB/PKCS7Padding)存储加密(原理上可以扩展各种java层各种存储加密)，ui支持可扩展，使用方便简单安全，防录制，去除内容回显等。
 
 - 依赖
 
