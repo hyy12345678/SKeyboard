@@ -1,12 +1,19 @@
 # **SKeyboard**
-Android自定义安全软键盘，jni方式MD5,DES(DES/ECB/PKCS7Padding)存储加密(原理上可以扩展各种java层各种存储加密)，ui支持可扩展，使用方便简单安全，防录制，去除内容回显等。
+Android自定义安全软键盘，jni方式MD5,DES(DES/ECB/PKCS7Padding)存储加密，ui支持可扩展，使用方便简单安全，防录制，去除内容回显等。
+
+main分支在c层通过jni回调java层算法库进行加密，理论上明文在jni回调时还是会出现在java内存中。
+openssl分支在c++层使用openssl的加密库算法，实现真正意义的在java内存中不出现密码明文。
 
 - 依赖
 
 ```java
+    //main分支
     implementation project(':skeyboardlib')//以module方式引入
     implementation 'org.bouncycastle:bcprov-jdk16:1.46'//使用的加密算法库
-
+    
+    //openssl分支
+    implementation project(':skeyboardlib')//以module方式引入
+    
 ```
 
 
