@@ -3,6 +3,7 @@ package net.hyy.fun.skeyboard;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -59,10 +60,10 @@ public class Main2Activity extends AppCompatActivity {
             public void onClick(View view) {
 //                clck.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
 
-                Toast.makeText(Main2Activity.this,""+safeEdit2.getText().toString(),Toast.LENGTH_SHORT).show();
+                Toast.makeText(Main2Activity.this, "" + safeEdit2.getText().toString(), Toast.LENGTH_SHORT).show();
 
                 String d2 = NativeHelper.getDecryptKey(String.valueOf(safeEdit2.getId()), "1212");
-                Log.e("TTTTTTT",d2);
+                Log.e("TTTTTTT", d2);
             }
         });
         LinearLayout keyboardContainer = findViewById(R.id.keyboardViewPlace);
@@ -85,16 +86,29 @@ public class Main2Activity extends AppCompatActivity {
             if (safeKeyboard.isShow()) {
                 safeKeyboard.hideKeyboard();
                 StringBuilder builder = new StringBuilder();
-                builder.append(NativeHelper.getDecryptKey(String.valueOf(safeEdit.getId()), "1212")+"\n");
-                builder.append(NativeHelper.getEncryptKey(String.valueOf(safeEdit.getId()), "1212")+"\n");
-                builder.append(NativeHelper.getEncryptKeyDES(String.valueOf(safeEdit.getId()), DES_KEY,"1212")+"\n");
-                builder.append(NativeHelper.getDecryptKey(String.valueOf(safeEdit2.getId()), "1212")+"\n");
-                builder.append(NativeHelper.getEncryptKey(String.valueOf(safeEdit2.getId()), "1212")+"\n");
-                builder.append(NativeHelper.getEncryptKeyDES(String.valueOf(safeEdit2.getId()), DES_KEY,"1212")+"\n");
-                builder.append(NativeHelper.getDecryptKey(String.valueOf(safeEdit3.getId()), "1212")+"\n");
-                builder.append(NativeHelper.getEncryptKey(String.valueOf(safeEdit3.getId()), "1212")+"\n");
-                builder.append(NativeHelper.getEncryptKeyDES(String.valueOf(safeEdit3.getId()),DES_KEY, "1212"));
+                builder.append(NativeHelper.getDecryptKey(String.valueOf(safeEdit.getId()), "1212") + "\n");
+                builder.append(NativeHelper.getEncryptKey(String.valueOf(safeEdit.getId()), "1212") + "\n");
+                builder.append(Base64.encodeToString(
+                        NativeHelper.getEncryptKeyDES(
+                                String.valueOf(safeEdit.getId()), DES_KEY.getBytes()),
+                        Base64.DEFAULT)
+                        + "\n");
+                builder.append(NativeHelper.getDecryptKey(String.valueOf(safeEdit2.getId()), "1212") + "\n");
+                builder.append(NativeHelper.getEncryptKey(String.valueOf(safeEdit2.getId()), "1212") + "\n");
+                builder.append(Base64.encodeToString(
+                        NativeHelper.getEncryptKeyDES(
+                                String.valueOf(safeEdit2.getId()), DES_KEY.getBytes()),
+                        Base64.DEFAULT)
+                        + "\n");
+                builder.append(NativeHelper.getDecryptKey(String.valueOf(safeEdit3.getId()), "1212") + "\n");
+                builder.append(NativeHelper.getEncryptKey(String.valueOf(safeEdit3.getId()), "1212") + "\n");
+                builder.append(Base64.encodeToString(
+                        NativeHelper.getEncryptKeyDES(
+                                String.valueOf(safeEdit3.getId()), DES_KEY.getBytes()),
+                        Base64.DEFAULT)
+                        + "\n");
                 ((TextView) findViewById(R.id.tv)).setText(builder.toString());
+                Log.e("Main2Activity",builder.toString());
                 return false;
             }
 

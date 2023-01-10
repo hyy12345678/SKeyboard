@@ -5,6 +5,11 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
+#配置加载头文件
+include_directories(./openssl/include)
+#将源码添加到NATIVE_SRC
+aux_source_directory( ./src/main/cpp NATIVE_SRC )
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
@@ -17,10 +22,17 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
-        MD5.cpp
-        MD5.h
-        skeyboad-lib.cpp
+        ${NATIVE_SRC}
         )
+
+
+#动态方式加载
+add_library(openssl SHARED IMPORTED )
+add_library(ssl SHARED IMPORTED )
+#引入第三方.so库
+set_target_properties(openssl PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/openssl/lib/${ANDROID_ABI}/libcrypto.so)
+set_target_properties(ssl PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/openssl/lib/${ANDROID_ABI}/libssl.so)
+
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -41,7 +53,9 @@ find_library( # Sets the name of the path variable.
 
 target_link_libraries( # Specifies the target library.
         skeyboad-lib
-
+        openssl
+        ssl
+        android
         # Links the target library to the log library
         # included in the NDK.
         ${log-lib})

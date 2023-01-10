@@ -1,11 +1,18 @@
 #include <jni.h>
-#include <assert.h>
+//#include <assert.h>
 #include <string.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
-#include "MD5.h"
-//#include "MD5.cpp"
-#include "logger.h"
+
+
+#include <openssl/hmac.h>
+#include <openssl/rsa.h>
+#include <openssl/pem.h>
+#include <openssl/md5.h>
+
+#include "skeyboad-lib.h"
+
 using namespace std;
 
 //extern "C" JNIEXPORT jstring JNICALL
@@ -20,21 +27,23 @@ using namespace std;
 
 
 
-class HashNode{
+class HashNode {
 public:
-    string  mKey;
-    string  mValue;
+    string mKey;
+    string mValue;
     HashNode *next;
 
-    HashNode(string key, string value){
-        mKey   = key;
+    HashNode(string key, string value) {
+        mKey = key;
         mValue = value;
         next = NULL;
     }
-    ~HashNode(){
+
+    ~HashNode() {
     }
-    HashNode& operator=(const HashNode& node){
-        if(this == &node) return *this;
+
+    HashNode &operator=(const HashNode &node) {
+        if (this == &node) return *this;
         mKey = node.mKey;
         mValue = node.mValue;
         next = node.next;
@@ -42,36 +51,43 @@ public:
     }
 };
 
-class HashMap{
+class HashMap {
 public:
     HashMap(int size);
+
     ~HashMap();
-    bool HMInsert(const string& key, const string& value);
-    bool HMDelete(const string& key);
-    string& HMFind(const string& key);
-    string& operator[](const string& key);
+
+    bool HMInsert(const string &key, const string &value);
+
+    bool HMDelete(const string &key);
+
+    string &HMFind(const string &key);
+
+    string &operator[](const string &key);
+
 private:
-    int hashfunc(const string& key);
-    HashNode ** mTable;
+    int hashfunc(const string &key);
+
+    HashNode **mTable;
     int mSize;
     string strnull;
 };
 
-HashMap::HashMap(int size):mSize(size){
-    mTable = new HashNode*[size];
-    for(int i=0; i<mSize; ++i){
+HashMap::HashMap(int size) : mSize(size) {
+    mTable = new HashNode *[size];
+    for (int i = 0; i < mSize; ++i) {
         mTable[i] = NULL;
     }
 //    strnull = "NULL";
     strnull = "";
 }
 
-HashMap::~HashMap(){
-    for(int i=0; i<mSize; ++i){
+HashMap::~HashMap() {
+    for (int i = 0; i < mSize; ++i) {
         HashNode *curNode = mTable[i];
-        while(curNode){
+        while (curNode) {
             HashNode *temp = curNode;
-            curNode =curNode->next;
+            curNode = curNode->next;
             delete temp;
         }
     }
@@ -80,25 +96,23 @@ HashMap::~HashMap(){
 
 HashMap hashmap(10);
 
-bool HashMap::HMInsert(const string& key, const string& value)
-{
-    int index = hashfunc(key)%mSize;
+bool HashMap::HMInsert(const string &key, const string &value) {
+    int index = hashfunc(key) % mSize;
     HashNode *node = new HashNode(key, value);
     node->next = mTable[index];
     mTable[index] = node;
     return true;
 }
 
-bool HashMap::HMDelete(const string &key)
-{
-    int index = hashfunc(key)%mSize;
+bool HashMap::HMDelete(const string &key) {
+    int index = hashfunc(key) % mSize;
     HashNode *node = mTable[index];
     HashNode *prev = NULL;
-    while(node){
-        if(key == node->mKey){
-            if(NULL == prev){
+    while (node) {
+        if (key == node->mKey) {
+            if (NULL == prev) {
                 mTable[index] = node->next;
-            }else{
+            } else {
                 prev->next = node->next;
             }
             delete node;
@@ -110,15 +124,14 @@ bool HashMap::HMDelete(const string &key)
     return false;
 }
 
-string& HashMap::HMFind(const string& key)
-{
-    int index = hashfunc(key)%mSize;
-    if(NULL == mTable[index]){
+string &HashMap::HMFind(const string &key) {
+    int index = hashfunc(key) % mSize;
+    if (NULL == mTable[index]) {
         return strnull;
-    }else{
+    } else {
         HashNode *node = mTable[index];
-        while(node){
-            if(key == node->mKey){
+        while (node) {
+            if (key == node->mKey) {
                 return node->mValue;
             }
             node = node->next;
@@ -127,15 +140,14 @@ string& HashMap::HMFind(const string& key)
     return strnull;
 }
 
-string& HashMap::operator[](const string& key)
-{
+string &HashMap::operator[](const string &key) {
     return HMFind(key);
 }
 
-int HashMap::hashfunc(const string& key){
+int HashMap::hashfunc(const string &key) {
     int hash = 0;
-    for(int i=0; i<key.length(); ++i){
-        hash = hash << 7^key[i];
+    for (int i = 0; i < key.length(); ++i) {
+        hash = hash << 7 ^ key[i];
     }
     return (hash & 0x7FFFFFFF);
 }
@@ -174,7 +186,8 @@ Java_net_hyy_fun_skeyboardlib_NativeHelper_addKey(JNIEnv *env, jclass type, jstr
 
 //    LOGI("Native-lib addKey：%s",jstring2str(env, text_).c_str());
     // TODO
-    hashmap.HMInsert(jstring2str(env, id_),hashmap.HMFind(jstring2str(env, id_)).append(jstring2str(env, text_)));
+    hashmap.HMInsert(jstring2str(env, id_),
+                     hashmap.HMFind(jstring2str(env, id_)).append(jstring2str(env, text_)));
 
 }
 
@@ -186,7 +199,7 @@ Java_net_hyy_fun_skeyboardlib_NativeHelper_deleteKey(JNIEnv *env, jclass type, j
     // TODO
     string input = hashmap.HMFind(jstring2str(env, id_));
     input.pop_back();
-    hashmap.HMInsert(jstring2str(env, id_),input);
+    hashmap.HMInsert(jstring2str(env, id_), input);
 
 }
 
@@ -197,7 +210,7 @@ Java_net_hyy_fun_skeyboardlib_NativeHelper_clearKey(JNIEnv *env, jclass type, js
     // TODO
     string input = hashmap.HMFind(jstring2str(env, id_));
     input.clear();
-    hashmap.HMInsert(jstring2str(env, id_),input);
+    hashmap.HMInsert(jstring2str(env, id_), input);
 
 }
 
@@ -211,16 +224,25 @@ Java_net_hyy_fun_skeyboardlib_NativeHelper_getEncryptKey(JNIEnv *env, jclass typ
     // TODO
     string input = hashmap.HMFind(jstring2str(env, id_));
 
-    string md5Result;
-    if(input.empty()){
-        md5Result = "";
-    }else{
-        MD5 md5 = MD5(input);
-        md5Result = md5.hexdigest();
-    }
 
-    //将char *类型转化成jstring返回给Java层
-    return env->NewStringUTF(md5Result.c_str());
+    if (input.empty()) {
+        return env->NewStringUTF("");
+    } else {
+//        MD5 md5 = MD5(input);
+//        md5Result = md5.hexdigest();
+
+        unsigned char sMD5[16] = {0};
+        MD5((const unsigned char *) (input.c_str()), strlen(input.c_str()), sMD5);
+
+        char buf[33];
+        for (int i = 0; i < 16; i++)
+            sprintf(buf + i * 2, "%02x", sMD5[i]);
+        buf[32] = 0;
+
+        //将char *类型转化成jstring返回给Java层
+        return env->NewStringUTF((std::string(buf)).c_str());
+
+    }
 
 
 }
@@ -235,96 +257,206 @@ Java_net_hyy_fun_skeyboardlib_NativeHelper_getDecryptKey(JNIEnv *env, jclass typ
     return (env)->NewStringUTF(hashmap.HMFind(jstring2str(env, id_)).data());
 }
 
+
+
 extern "C"
-JNIEXPORT jstring JNICALL
-Java_net_hyy_fun_skeyboardlib_NativeHelper_getEncryptKeyDES(JNIEnv *env, jclass type, jstring id_,
-                                                            jstring key_, jstring timestamp_) {
+JNIEXPORT jbyteArray JNICALL
+Java_net_hyy_fun_skeyboardlib_NativeHelper_aesEncryption(JNIEnv *env, jclass type,
+                                                         jbyteArray src_) {
+    jbyte *src = env->GetByteArrayElements(src_, NULL);
+    jsize src_Len = env->GetArrayLength(src_);
 
-    const char *id = env->GetStringUTFChars(id_, 0);
-    const char *key = env->GetStringUTFChars(key_, 0);
-    const char *timestamp = env->GetStringUTFChars(timestamp_, 0);
+    LOGD("########## Estr = %s", src);
 
-    // TODO
-    if(hashmap.HMFind(id).empty()){
-        env->ReleaseStringUTFChars(id_, id);
-        env->ReleaseStringUTFChars(key_, key);
-        env->ReleaseStringUTFChars(timestamp_, timestamp);
-        return env->NewStringUTF("");
-    }
+    int outlen = 0, cipherText_len = 0;
 
+    unsigned char *out = (unsigned char *) malloc((src_Len / 16 + 1) * 16);
+    //清空内存空间
+    memset(out, 0, (src_Len / 16 + 1) * 16);
 
-    const char* content = hashmap.HMFind(id).c_str();
+    EVP_CIPHER_CTX ctx;
+    EVP_CIPHER_CTX_init(&ctx);
+    //    LOGD("AES->指定加密算法，初始化加密key/iv");
+    //这里可以修改签名算法：EVP_aes_128_cbc/EVP_aes_128_ecb/EVP_aes_128_cfb1/EVP_aes_128_cfb8
+    EVP_EncryptInit_ex(&ctx, EVP_aes_128_cbc(), NULL, (const unsigned char *) AES_SECRET_KEY,
+                       (const unsigned char *) AES_IV);
+    //    LOGD("AES->对数据进行加密运算");
+    EVP_EncryptUpdate(&ctx, out, &outlen, (const unsigned char *) src, src_Len);
+    cipherText_len = outlen;
 
-    //1、获取字节码
-    jclass jclazz = (*env).FindClass("net.hyy.fun.skeyboardlib.DESUtils3");
-//    jclass jclazz = (*env).FindClass("net.hyy.fun.skeyboardlib.DummyCCallJava");
+    //    LOGD("AES->结束加密运算");
+    EVP_EncryptFinal_ex(&ctx, out + outlen, &outlen);
+    cipherText_len += outlen;
 
-    //2、获取方法
-    jmethodID jmethodId = (*env).GetStaticMethodID(jclazz,"encrypt","(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
+    LOGD("########## Eout = %s", out);
 
+    //    LOGD("AES->EVP_CIPHER_CTX_cleanup");
+    EVP_CIPHER_CTX_cleanup(&ctx);
 
-    if (NULL == jmethodId) {
-        env->DeleteLocalRef(jclazz);
-        return NULL;
-    }
+    //    LOGD("AES->从jni释放数据指针");
+    env->ReleaseByteArrayElements(src_, src, 0);
 
-    //4、调用方法
-    jstring str_arg1 = env->NewStringUTF(content);
-    jstring str_arg2 = env->NewStringUTF(key);
+    jbyteArray cipher = env->NewByteArray(cipherText_len);
+    //    LOGD("AES->在堆中分配ByteArray数组对象成功，将拷贝数据到数组中");
+    env->SetByteArrayRegion(cipher, 0, cipherText_len, (jbyte *) out);
+    //    LOGD("AES->释放内存");
+    free(out);
 
-    jstring result;
-    result = (jstring) env->CallStaticObjectMethod(jclazz, jmethodId, str_arg1, str_arg2);
-
-    const char *result_str = env->GetStringUTFChars(result, NULL);
-//    LOGI("获取到Java层返回的数据 : %s", result_str);
-//    LOGI("Native-lib step3");
-
-    (env)->DeleteLocalRef(jclazz);
-    env->DeleteLocalRef(result);
-    env->ReleaseStringUTFChars(id_, id);
-    env->ReleaseStringUTFChars(key_, key);
-    env->ReleaseStringUTFChars(timestamp_, timestamp);
-
-    return env->NewStringUTF(result_str);
+    return cipher;
+}
 
 
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_net_hyy_fun_skeyboardlib_NativeHelper_aesCrypt(JNIEnv *env, jclass type, jbyteArray src_) {
+
+    jbyte *src = env->GetByteArrayElements(src_, NULL);
+    jsize src_Len = env->GetArrayLength(src_);
+
+    LOGD("########## Dstr = %s", src);
+
+    int outlen = 0, plaintext_len = 0;
+
+    unsigned char *out = (unsigned char *) malloc(src_Len);
+    memset(out, 0, src_Len);
+
+    EVP_CIPHER_CTX ctx;
+    EVP_CIPHER_CTX_init(&ctx);
+//    LOGD("AES->指定解密算法，初始化解密key/iv");
+    EVP_DecryptInit_ex(&ctx, EVP_aes_128_cbc(), NULL, (const unsigned char *) AES_SECRET_KEY,
+                       (const unsigned char *) AES_IV);
+//    LOGD("AES->对数据进行解密运算");
+    EVP_DecryptUpdate(&ctx, out, &outlen, (const unsigned char *) src, src_Len);
+    plaintext_len = outlen;
+
+//    LOGD("AES->结束解密运算");
+    EVP_DecryptFinal_ex(&ctx, out + outlen, &outlen);
+    plaintext_len += outlen;
+
+    LOGD("########## Dout = %s", out);
+
+//    LOGD("AES->EVP_CIPHER_CTX_cleanup");
+    EVP_CIPHER_CTX_cleanup(&ctx);
+
+//    LOGD("AES->从jni释放数据指针");
+    env->ReleaseByteArrayElements(src_, src, 0);
+
+    jbyteArray cipher = env->NewByteArray(plaintext_len);
+//    LOGD("AES->在堆中分配ByteArray数组对象成功，将拷贝数据到数组中");
+    env->SetByteArrayRegion(cipher, 0, plaintext_len, (jbyte *) out);
+//    LOGD("AES->释放内存");
+    free(out);
+
+    return cipher;
+}
 
 
-//    //调用某个类的static方法
-//
-//    //JVM使用一个类时,是需要先判断这个类是否被加载了,如果没被加载则还需要加载一下才能使用
-//    //1. 从classpath路径下搜索MyJNIClass这个类,并返回该类的Class对象
-//    jclass clazz = env->FindClass("net.hyy.fun.skeyboardlib.DummyCCallJava");
-//    //2. 从clazz类中查找getDes方法 得到这个静态方法的方法id
-//    jmethodID mid_get_des = env->GetStaticMethodID(clazz, "getDes", "(Ljava/lang/String;)Ljava/lang/String;");
-//    //3. 构建入参,调用static方法,获取返回值
-//    jstring str_arg = env->NewStringUTF("我是xfhy");
-//    jstring result = (jstring) env->CallStaticObjectMethod(clazz, mid_get_des, str_arg);
-//    const char *result_str = env->GetStringUTFChars(result, NULL);
-//    LOGI("获取到Java层返回的数据 : %s", result_str);
-//
-//    //4. 移除局部引用
-//    env->DeleteLocalRef(clazz);
-//    env->DeleteLocalRef(str_arg);
-//    env->DeleteLocalRef(result);
-//
-//    return env->NewStringUTF("lalala");
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_net_hyy_fun_skeyboardlib_NativeHelper_test(JNIEnv *env, jclass type, jbyteArray src_) {
+
+    unsigned char sKey[] = "randromdata";
+    unsigned char sIV[] = "";
+
+    jbyte *src = env->GetByteArrayElements(src_, NULL);
+    jsize src_Len = env->GetArrayLength(src_);
+
+
+    int outlen = 0, cipherText_len = 0;
+
+    unsigned char *out = (unsigned char *) malloc((src_Len / 16 + 1) * 16);
+    //清空内存空间
+    memset(out, 0, (src_Len / 16 + 1) * 16);
+
+    EVP_CIPHER_CTX ctx;
+    EVP_CIPHER_CTX_init(&ctx);
+    //    LOGD("AES->指定加密算法，初始化加密key/iv");
+    //这里可以修改签名算法：EVP_aes_128_cbc/EVP_aes_128_ecb/EVP_aes_128_cfb1/EVP_aes_128_cfb8
+    EVP_EncryptInit_ex(&ctx, EVP_des_ecb(), NULL, sKey, sIV);
+    //    LOGD("AES->对数据进行加密运算");
+    EVP_EncryptUpdate(&ctx, out, &outlen, (const unsigned char *) src, src_Len);
+    cipherText_len = outlen;
+
+    //    LOGD("AES->结束加密运算");
+    EVP_EncryptFinal_ex(&ctx, out + outlen, &outlen);
+    cipherText_len += outlen;
+
+//    LOGD("########## Eout = %s", out);
+
+    //    LOGD("AES->EVP_CIPHER_CTX_cleanup");
+    EVP_CIPHER_CTX_cleanup(&ctx);
+
+    //    LOGD("AES->从jni释放数据指针");
+    env->ReleaseByteArrayElements(src_, src, 0);
+
+    jbyteArray cipher = env->NewByteArray(cipherText_len);
+    //    LOGD("AES->在堆中分配ByteArray数组对象成功，将拷贝数据到数组中");
+    env->SetByteArrayRegion(cipher, 0, cipherText_len, (jbyte *) out);
+    //    LOGD("AES->释放内存");
+    free(out);
+
+    return cipher;
 
 }
 
-//extern "C"
-//JNIEXPORT jstring JNICALL
-//Java_net_hyy_fun_skeyboardlib_NativeHelper_test(JNIEnv *env, jclass type, jstring id_, jstring key_,
-//                                                jstring timestamp_) {
-//    const char *id = env->GetStringUTFChars(id_, 0);
-//    const char *key = env->GetStringUTFChars(key_, 0);
-//    const char *timestamp = env->GetStringUTFChars(timestamp_, 0);
-//
-//    // TODO
-//
-//    env->ReleaseStringUTFChars(id_, id);
-//    env->ReleaseStringUTFChars(key_, key);
-//    env->ReleaseStringUTFChars(timestamp_, timestamp);
-//
-//    return env->NewStringUTF(returnValue);
-//}
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_net_hyy_fun_skeyboardlib_NativeHelper_getEncryptKeyDES(JNIEnv *env, jclass type, jstring id_,
+                                                            jbyteArray key_) {
+
+    const char *id = env->GetStringUTFChars(id_, 0);
+    jbyte *key = env->GetByteArrayElements(key_, NULL);
+
+
+    string content = hashmap.HMFind(id);
+
+    if(content.empty()){
+        env->ReleaseStringUTFChars(id_, id);
+        env->ReleaseByteArrayElements(key_, key, 0);
+
+        return env->NewByteArray(0);
+    }
+
+
+    int content_Len = content.length();
+
+    // TODO
+
+    int outlen = 0, cipherText_len = 0;
+
+    unsigned char *out = (unsigned char *) malloc((content_Len / 16 + 1) * 16);
+    //清空内存空间
+    memset(out, 0, (content_Len / 16 + 1) * 16);
+
+    EVP_CIPHER_CTX ctx;
+    EVP_CIPHER_CTX_init(&ctx);
+    //    LOGD("AES->指定加密算法，初始化加密key/iv");
+    //这里可以修改签名算法：EVP_aes_128_cbc/EVP_aes_128_ecb/EVP_aes_128_cfb1/EVP_aes_128_cfb8
+    EVP_EncryptInit_ex(&ctx, EVP_des_ecb(), NULL, (const unsigned char *) key,
+                       (const unsigned char *) key);
+    //    LOGD("AES->对数据进行加密运算");
+    EVP_EncryptUpdate(&ctx, out, &outlen, (const unsigned char *) content.c_str(), content_Len);
+    cipherText_len = outlen;
+
+    //    LOGD("AES->结束加密运算");
+    EVP_EncryptFinal_ex(&ctx, out + outlen, &outlen);
+    cipherText_len += outlen;
+
+//    LOGD("########## Eout = %s", out);
+
+    //    LOGD("AES->EVP_CIPHER_CTX_cleanup");
+    EVP_CIPHER_CTX_cleanup(&ctx);
+
+
+    jbyteArray cipher = env->NewByteArray(cipherText_len);
+    //    LOGD("AES->在堆中分配ByteArray数组对象成功，将拷贝数据到数组中");
+    env->SetByteArrayRegion(cipher, 0, cipherText_len, (jbyte *) out);
+    //    LOGD("AES->释放内存");
+    free(out);
+
+
+    env->ReleaseStringUTFChars(id_, id);
+    env->ReleaseByteArrayElements(key_, key, 0);
+
+    return cipher;
+}

@@ -20,12 +20,20 @@ public class NativeHelper {
     public static final native String getDecryptKey(String id, String timestamp);
 
 
-    public static final native String getEncryptKeyDES(String id, String key,String timestamp);
+    public static final native byte[] getEncryptKeyDES(String id,byte[] key);
 
+
+    public static native byte[] aesEncryption(byte[] src);
+
+    public static native byte[] aesCrypt(byte[] src);
+
+
+    public static native byte[] test(byte[] src);
 
 
     // Used to load the 'native-lib' library on application startup.
     static {
+        System.loadLibrary("crypto");
         System.loadLibrary("skeyboad-lib");
     }
 

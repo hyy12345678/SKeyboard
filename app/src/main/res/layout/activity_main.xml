@@ -58,5 +58,19 @@
         android:text="getEncryptKeyDES"/>
 
 
+    <Button
+        android:id="@+id/btn_openssl_aes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="openssl_aes"/>
+
+    <Button
+        android:id="@+id/btn_test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="test"/>
+
 
 </LinearLayout>
