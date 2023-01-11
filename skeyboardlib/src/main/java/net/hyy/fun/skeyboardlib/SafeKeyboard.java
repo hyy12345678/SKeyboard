@@ -12,17 +12,18 @@ import android.os.Looper;
 import android.os.SystemClock;
 import android.os.Vibrator;
 import android.text.Editable;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-
 
 
 import java.lang.reflect.InvocationTargetException;
@@ -78,29 +79,52 @@ public class SafeKeyboard {
     private boolean isLetterRandom;
     private boolean isSymbolRandom;
 
-    public SafeKeyboard(Context mContext, LinearLayout layout, List<EditText> editTextList, boolean isNumberRandom, boolean isLetterRandom, boolean isSymbolRandom) {
-        this.mContext = mContext;
-        this.layout = layout;
-        this.editTextList = editTextList;
-        this.keyboardContainerResId = R.layout.seckey_layout_keyboard_containor;
-        this.keyboardResId = LayoutInflater.from(mContext).inflate(R.layout.seckey_layout_keyboard_containor, null).findViewById(R.id.safeKeyboardLetter).getId();
-        this.isNumberRandom = isNumberRandom;
-        this.isLetterRandom = isLetterRandom;
-        this.isSymbolRandom = isSymbolRandom;
-        vibrator = (Vibrator) mContext.getSystemService(Service.VIBRATOR_SERVICE);
-        delDrawable = mContext.getResources().getDrawable(R.drawable.seckey_icon_del);
-        lowDrawable = mContext.getResources().getDrawable(R.drawable.seckey_icon_capital_default);
-        upDrawable = mContext.getResources().getDrawable(R.drawable.seckey_icon_capital_selected);
-        logoDrawable = mContext.getResources().getDrawable(R.drawable.seckey_logo_anquan);
-        downDrawable = mContext.getResources().getDrawable(R.drawable.seckey_keyboard_done_);
-        initKeyboard();
-        initAnimation();
-        addListeners();
+
+    private final View mScrollLayout;
+    private int[] originalScrollPosInScr;
+    private int[] originalScrollPosInPar;
+    private int mScreenWidth;
+    private int mScreenHeight;
+    private float toBackSize;
+
+
+
+    public SafeKeyboard(Context mContext, LinearLayout layout, List<EditText> editTextList,View mScrollLayout,
+                        boolean isNumberRandom, boolean isLetterRandom, boolean isSymbolRandom) {
+//        this.mContext = mContext;
+//        this.layout = layout;
+//        this.editTextList = editTextList;
+//        this.keyboardContainerResId = R.layout.seckey_layout_keyboard_containor;
+//        this.keyboardResId = LayoutInflater.from(mContext).inflate(R.layout.seckey_layout_keyboard_containor, null).findViewById(R.id.safeKeyboardLetter).getId();
+//        this.isNumberRandom = isNumberRandom;
+//        this.isLetterRandom = isLetterRandom;
+//        this.isSymbolRandom = isSymbolRandom;
+//        vibrator = (Vibrator) mContext.getSystemService(Service.VIBRATOR_SERVICE);
+//        delDrawable = mContext.getResources().getDrawable(R.drawable.seckey_icon_del);
+//        lowDrawable = mContext.getResources().getDrawable(R.drawable.seckey_icon_capital_default);
+//        upDrawable = mContext.getResources().getDrawable(R.drawable.seckey_icon_capital_selected);
+//        logoDrawable = mContext.getResources().getDrawable(R.drawable.seckey_logo_anquan);
+//        downDrawable = mContext.getResources().getDrawable(R.drawable.seckey_keyboard_done_);
+//        initKeyboard();
+//        initAnimation();
+//        addListeners();
+
+        this(mContext, layout, editTextList,mScrollLayout,
+                R.layout.seckey_layout_keyboard_containor,
+                LayoutInflater.from(mContext).inflate(R.layout.seckey_layout_keyboard_containor, null).findViewById(R.id.safeKeyboardLetter).getId(),
+                mContext.getResources().getDrawable(R.drawable.seckey_icon_del),
+                mContext.getResources().getDrawable(R.drawable.seckey_icon_capital_default),
+                mContext.getResources().getDrawable(R.drawable.seckey_icon_capital_selected),
+                mContext.getResources().getDrawable(R.drawable.seckey_logo_anquan),
+                mContext.getResources().getDrawable(R.drawable.seckey_keyboard_done_),
+                isNumberRandom, isLetterRandom, isSymbolRandom
+        );
 
     }
 
-    SafeKeyboard(Context mContext, LinearLayout layout, List<EditText> editTextList, int id, int keyId,
-                 Drawable del, Drawable low, Drawable up, Drawable logo, Drawable down, boolean isNumberRandom, boolean isLetterRandom, boolean isSymbolRandom) {
+    SafeKeyboard(Context mContext, LinearLayout layout, List<EditText> editTextList,View mScrollLayout,
+                 int id, int keyId, Drawable del, Drawable low, Drawable up, Drawable logo, Drawable down,
+                 boolean isNumberRandom, boolean isLetterRandom, boolean isSymbolRandom) {
         this.mContext = mContext;
         this.layout = layout;
         this.editTextList = editTextList;
@@ -115,6 +139,23 @@ public class SafeKeyboard {
         this.isLetterRandom = isLetterRandom;
         this.isSymbolRandom = isSymbolRandom;
         vibrator = (Vibrator) mContext.getSystemService(Service.VIBRATOR_SERVICE);
+
+        this.mScrollLayout = mScrollLayout;
+
+        originalScrollPosInScr = new int[]{0, 0, 0, 0};
+        originalScrollPosInPar = new int[]{0, 0, 0, 0};
+
+        // 获取 WindowManager 实例, 得到屏幕的操作权
+        WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+        if (wm != null) {
+            // 给 metrics 赋值
+            DisplayMetrics metrics = new DisplayMetrics();
+            wm.getDefaultDisplay().getMetrics(metrics);
+            // 设备屏幕的宽度,高度变量
+            mScreenWidth = metrics.widthPixels;
+            mScreenHeight = metrics.heightPixels;
+        }
+
 
         initKeyboard();
         initAnimation();
@@ -258,7 +299,7 @@ public class SafeKeyboard {
     }
 
     private boolean isNumber(String str) {
-        String numStr =  mContext.getString(R.string.seckey_zeroTonine);
+        String numStr = mContext.getString(R.string.seckey_zeroTonine);
         return numStr.contains(str.toLowerCase());
     }
 
@@ -448,6 +489,9 @@ public class SafeKeyboard {
         @Override
         public void run() {
             isHideStart = false;
+
+            doScrollLayoutBack(true, null);
+
             if (keyContainer.getVisibility() != View.GONE) {
                 keyContainer.setVisibility(View.GONE);
             }
@@ -463,6 +507,8 @@ public class SafeKeyboard {
             if (!mEditText.isFocused()) {
                 hideKeyboard();
             }
+
+            doScrollLayout();
         }
     };
 
@@ -528,6 +574,7 @@ public class SafeKeyboard {
                             return false;
                         }
                         if (!isKeyboardShown()) {
+                            getOriginalScrollLayoutPos();
                             showHandler.removeCallbacks(showRun);
                             showHandler.postDelayed(showRun, SHOW_DELAY);
                         }
@@ -550,6 +597,7 @@ public class SafeKeyboard {
                             }
                             if (isFocus) {
                                 if (isKeyboardShown()) {
+                                    getOriginalScrollLayoutPos();
                                     hideKeyboard();
                                 }
 
@@ -557,6 +605,7 @@ public class SafeKeyboard {
                         } else {
                             ((EditText) v).setText("");
                             if (!isKeyboardShown()) {
+                                getOriginalScrollLayoutPos();
                                 showHandler.removeCallbacks(showRun);
                                 showHandler.postDelayed(showRun, SHOW_DELAY);
                             }
@@ -770,4 +819,99 @@ public class SafeKeyboard {
         keyboardView.setHideDrawable(downDrawable);
     }
 
+
+    /**
+     * 更新 mScrollLayout 原始位置, 且只获取一次
+     */
+    private void getOriginalScrollLayoutPos() {
+        if (originalScrollPosInScr[0] == 0 && originalScrollPosInScr[1] == 0) {
+            int[] pos = new int[]{0, 0};
+            mScrollLayout.getLocationOnScreen(pos);
+            originalScrollPosInScr[0] = pos[0];
+            originalScrollPosInScr[1] = pos[1];
+            originalScrollPosInScr[2] = pos[0] + mScrollLayout.getWidth();
+            originalScrollPosInScr[3] = pos[1] + mScrollLayout.getHeight();
+        }
+
+        if (originalScrollPosInPar[0] == 0 && originalScrollPosInPar[1] == 0
+                && originalScrollPosInPar[2] == 0 && originalScrollPosInPar[3] == 0) {
+            originalScrollPosInPar[0] = mScrollLayout.getLeft();
+            originalScrollPosInPar[1] = mScrollLayout.getTop();
+            originalScrollPosInPar[2] = mScrollLayout.getRight();
+            originalScrollPosInPar[3] = mScrollLayout.getBottom();
+        }
+    }
+
+
+    private void doScrollLayout() {
+        // 计算 SafeKeyboard 显示后是否会遮挡住 EditText
+        editNeedScroll(mEditText);
+    }
+
+    private void editNeedScroll(EditText mEditText) {
+        int keyboardHeight = keyContainer.getHeight();      // 获取键盘布局的高度
+        int keyStartY = mScreenHeight - keyboardHeight;
+        int[] position = new int[2];
+        mEditText.getLocationOnScreen(position);
+        int mEditTextBottomY = position[1] + mEditText.getHeight();
+        if (mEditTextBottomY > keyStartY) {
+            // 说明这个 EditText 的底部在 键盘 View 顶部以下, 即 EditText 被键盘遮挡了
+            final float to = keyStartY - mEditTextBottomY - 10; // 为负值, 需要往上移动的距离, 往上为负值, 往下为正值
+            if (position[1] + to < originalScrollPosInScr[1]) {
+                // 说明, scrollLayout 被往上顶起之后, EditText 所在位置可能会被 scrollLayout 上面的其他 View 遮挡或者重合了导致显示不准确,
+                // 那么顶起操作在这里就显示不合适了, 所以这里最好是添加一个长文本显示功能
+                // 说明往上顶起之后 mEditText 会被遮挡, 即 mEditText 的 top 距离顶部的距离 小于 要移动的距离
+                // 这里就不需要顶起了, 需要显示一个长文本显示页面
+                // TODO... 添加一个长文本显示功能, 不过这里的长文本显示似乎没有什么意义
+                return;
+            }
+            toBackSize = to;
+            mScrollLayout.animate().translationYBy(toBackSize).setDuration(150).start();
+        }
+    }
+
+
+    private boolean doScrollLayoutBack(final boolean isHide, EditText mEditText) {
+        int thisScrollY = 0;
+        if (!isHide && mEditText != null) {
+            // 这种情况说明是点击了一个 EditText, 则需要判断是否需要移动 mScrollLayout 来适应 SafeKeyboard 的显示
+            int[] mEditPos = new int[2];
+            mEditText.getLocationOnScreen(mEditPos);
+            Log.e("SafeKeyboard_Scroll", "0: " + mEditPos[0] + ", 1: " + mEditPos[1]);
+
+            int keyboardHeight = keyContainer.getHeight();
+            int keyStartY = mScreenHeight - keyboardHeight;
+            getOriginalScrollLayoutPos();
+
+            if (mEditText.getHeight() + 10 > keyStartY - originalScrollPosInScr[1]) {
+                // mEditText 的高度 大于 SafeKeyboard 上边界到 mScrollLayout 上边界的距离, 即 mEditText 无法完全显示
+                // TODO... 添加一个长文本输入功能
+
+                return false;
+            } else {
+                // 可以正常显示
+                if (mEditPos[1] < originalScrollPosInScr[1]) {
+                    // 说明当前的 mEditText 的 top 位置已经被其他布局遮挡, 需要布局往下滑动一点, 使 mEditText 可以完全显示
+                    thisScrollY = originalScrollPosInScr[1] - mEditPos[1] + 10; // 正值
+                } else if (mEditPos[1] + mEditText.getHeight() > keyStartY) {
+                    // 说明当前的 mEditText 的 bottom 位置已经被其他布局遮挡, 需要布局往上滑动一点, 使 mEditText 可以完全显示
+                    thisScrollY = keyStartY - mEditPos[1] - mEditText.getHeight(); //负值
+                } else {
+                    // 各项均正常, 不需要重新滑动
+                    Log.i("SafeKeyboard_LOG", "Need not to scroll");
+                    return false;
+                }
+            }
+        }
+
+        toBackSize += thisScrollY;
+        if (isHide) {
+            mScrollLayout.animate().setDuration(150).translationYBy(-toBackSize).start();
+            toBackSize = 0;
+        } else {
+            mScrollLayout.animate().setDuration(150).translationYBy(thisScrollY).start();
+        }
+
+        return true;
+    }
 }

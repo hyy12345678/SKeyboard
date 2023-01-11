@@ -33,6 +33,7 @@ public class Main2Activity extends AppCompatActivity {
     private EditText safeEdit2;
     private EditText safeEdit3;
     private List<EditText> editList = new ArrayList<>();
+    private View scroll_layout;
 
     String DES_KEY = "randromdata";
 
@@ -48,6 +49,8 @@ public class Main2Activity extends AppCompatActivity {
         safeEdit = findViewById(R.id.safeEditText);
         safeEdit2 = findViewById(R.id.safeEditText2);
         safeEdit3 = findViewById(R.id.safeEditText3);
+
+        scroll_layout = findViewById(R.id.scroll_layout);
 
         safeEdit.setTag("number");
         editList.add(safeEdit);
@@ -67,7 +70,7 @@ public class Main2Activity extends AppCompatActivity {
             }
         });
         LinearLayout keyboardContainer = findViewById(R.id.keyboardViewPlace);
-        safeKeyboard = new SafeKeyboard(Main2Activity.this, keyboardContainer, editList,
+        safeKeyboard = new SafeKeyboard(Main2Activity.this, keyboardContainer, editList, scroll_layout,
                 true, false, false);
        /* safeKeyboard.setDelDrawable(this.getResources().getDrawable(R.drawable.seckey_icon_del));
         safeKeyboard.setLowDrawable(this.getResources().getDrawable(R.drawable.seckey_icon_capital_default));
@@ -108,7 +111,7 @@ public class Main2Activity extends AppCompatActivity {
                         Base64.DEFAULT)
                         + "\n");
                 ((TextView) findViewById(R.id.tv)).setText(builder.toString());
-                Log.e("Main2Activity",builder.toString());
+                Log.e("Main2Activity", builder.toString());
                 return false;
             }
 

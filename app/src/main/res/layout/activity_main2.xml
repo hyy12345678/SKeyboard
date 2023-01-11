@@ -6,58 +6,66 @@
     android:layout_height="match_parent"
     tools:context=".Main2Activity">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/scroll_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="250dp"
+            android:orientation="vertical">
 
 
-        <Button
-            android:id="@+id/feed_back"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:hapticFeedbackEnabled="true"
-            android:text="点我震动"/>
+            <Button
+                android:id="@+id/feed_back"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hapticFeedbackEnabled="true"
+                android:text="点我震动" />
 
-        <EditText
-            android:id="@+id/normalEditText"
-            android:layout_width="match_parent"
-            android:layout_height="50sp"
-            android:layout_marginEnd="10sp"
-            android:layout_marginStart="10sp"
-            android:hint="@string/keyboard_system"
-            android:inputType="text" />
-        <net.hyy.fun.skeyboard.SafeEditText
-            android:id="@+id/safeEditText"
-            android:layout_width="match_parent"
-            android:layout_height="50sp"
-            android:layout_marginEnd="10sp"
-            android:layout_marginStart="10sp"
-            android:hint="安全输入-数字"
-            />
+            <EditText
+                android:id="@+id/normalEditText"
+                android:layout_width="match_parent"
+                android:layout_height="50sp"
+                android:layout_marginStart="10sp"
+                android:layout_marginEnd="10sp"
+                android:hint="@string/keyboard_system"
+                android:inputType="text" />
 
-        <net.hyy.fun.skeyboard.SafeEditText
-            android:id="@+id/safeEditText2"
-            android:layout_width="match_parent"
-            android:layout_height="50sp"
-            android:layout_marginEnd="10sp"
-            android:layout_marginStart="10sp"
-            android:hint="安全输入-任意字符"
-            />
-        <net.hyy.fun.skeyboard.SafeEditText
-            android:id="@+id/safeEditText3"
-            android:layout_width="match_parent"
-            android:layout_height="50sp"
-            android:layout_marginEnd="10sp"
-            android:layout_marginStart="10sp"
-            android:hint="安全输入-任意字符"
-            />
-        <TextView
-            android:id="@+id/tv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            <net.hyy.fun.skeyboard.SafeEditText
+                android:id="@+id/safeEditText"
+                android:layout_width="match_parent"
+                android:layout_height="50sp"
+                android:layout_marginStart="10sp"
+                android:layout_marginEnd="10sp"
+                android:hint="安全输入-数字" />
 
-    </LinearLayout>
+            <net.hyy.fun.skeyboard.SafeEditText
+                android:id="@+id/safeEditText2"
+                android:layout_width="match_parent"
+                android:layout_height="50sp"
+                android:layout_marginStart="10sp"
+                android:layout_marginEnd="10sp"
+                android:hint="安全输入-任意字符" />
+
+            <net.hyy.fun.skeyboard.SafeEditText
+                android:id="@+id/safeEditText3"
+                android:layout_width="match_parent"
+                android:layout_height="50sp"
+                android:layout_marginStart="10sp"
+                android:layout_marginEnd="10sp"
+                android:hint="安全输入-任意字符" />
+
+            <TextView
+                android:id="@+id/tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+    </ScrollView>
 
     <LinearLayout
         android:id="@+id/keyboardViewPlace"
