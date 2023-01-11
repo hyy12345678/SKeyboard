@@ -28,7 +28,7 @@ openssl分支在c++层使用openssl的加密库算法，实现真正意义的在
                 true, false, false);
 ```
 - editList：需要用到安全键盘的EditText，可以添加进此List，
-- 目标 EditText 父布局 View
+- scroll_layout：目标 EditText 父布局 View
   多个 EditText 共用 SafeKeyboard 但其直接父布局不是同一个 View 时, 传入公共父布局
   传入目的是：当 EditText 需要被顶起的时候, 顶起该布局, 以达到输入时可以显示已输入内容的功能
   注意, 可以是 EditText 本身, 不过需要传入 View 类型的 EditText
