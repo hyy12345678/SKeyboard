@@ -87,10 +87,12 @@ public class SafeKeyboard {
     private int mScreenHeight;
     private float toBackSize;
 
+    private boolean mPreviewEnabled = false;
+
 
 
     public SafeKeyboard(Context mContext, LinearLayout layout, List<EditText> editTextList,View mScrollLayout,
-                        boolean isNumberRandom, boolean isLetterRandom, boolean isSymbolRandom) {
+                        boolean isNumberRandom, boolean isLetterRandom, boolean isSymbolRandom,boolean isPreviewEnable) {
 //        this.mContext = mContext;
 //        this.layout = layout;
 //        this.editTextList = editTextList;
@@ -117,14 +119,14 @@ public class SafeKeyboard {
                 mContext.getResources().getDrawable(R.drawable.seckey_icon_capital_selected),
                 mContext.getResources().getDrawable(R.drawable.seckey_logo_anquan),
                 mContext.getResources().getDrawable(R.drawable.seckey_keyboard_done_),
-                isNumberRandom, isLetterRandom, isSymbolRandom
+                isNumberRandom, isLetterRandom, isSymbolRandom,isPreviewEnable
         );
 
     }
 
     SafeKeyboard(Context mContext, LinearLayout layout, List<EditText> editTextList,View mScrollLayout,
                  int id, int keyId, Drawable del, Drawable low, Drawable up, Drawable logo, Drawable down,
-                 boolean isNumberRandom, boolean isLetterRandom, boolean isSymbolRandom) {
+                 boolean isNumberRandom, boolean isLetterRandom, boolean isSymbolRandom,boolean isPreviewEnable) {
         this.mContext = mContext;
         this.layout = layout;
         this.editTextList = editTextList;
@@ -155,6 +157,8 @@ public class SafeKeyboard {
             mScreenWidth = metrics.widthPixels;
             mScreenHeight = metrics.heightPixels;
         }
+
+        this.mPreviewEnabled = isPreviewEnable;
 
 
         initKeyboard();
@@ -236,7 +240,7 @@ public class SafeKeyboard {
         keyboardView.setLogoDrawable(logoDrawable);
         keyboardView.setHideDrawable(downDrawable);
         keyboardView.setEnabled(true);
-        keyboardView.setPreviewEnabled(false);
+        keyboardView.setPreviewEnabled(mPreviewEnabled && false);
         keyboardView.setOnKeyboardActionListener(listener);
 
         ImageView done = keyContainer.findViewById(R.id.keyboardDone);
@@ -311,14 +315,14 @@ public class SafeKeyboard {
         public void onPress(int primaryCode) {
             vibrator.vibrate(new long[]{0, 50}, -1);
             if (keyboardType == 3) {
-                keyboardView.setPreviewEnabled(false);
+                keyboardView.setPreviewEnabled(mPreviewEnabled && false);
             } else {
-                keyboardView.setPreviewEnabled(true);
+                keyboardView.setPreviewEnabled(mPreviewEnabled && true);
                 if (primaryCode == -1 || primaryCode == -5 || primaryCode == 32 || primaryCode == -2
                         || primaryCode == 100860 || primaryCode == -35 || primaryCode == -7 || primaryCode == -8) {
-                    keyboardView.setPreviewEnabled(false);
+                    keyboardView.setPreviewEnabled(mPreviewEnabled && false);
                 } else {
-                    keyboardView.setPreviewEnabled(true);
+                    keyboardView.setPreviewEnabled(mPreviewEnabled && true);
                 }
             }
         }

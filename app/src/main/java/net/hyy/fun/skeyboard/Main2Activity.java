@@ -71,7 +71,7 @@ public class Main2Activity extends AppCompatActivity {
         });
         LinearLayout keyboardContainer = findViewById(R.id.keyboardViewPlace);
         safeKeyboard = new SafeKeyboard(Main2Activity.this, keyboardContainer, editList, scroll_layout,
-                true, false, false);
+                true, false, false, false);
        /* safeKeyboard.setDelDrawable(this.getResources().getDrawable(R.drawable.seckey_icon_del));
         safeKeyboard.setLowDrawable(this.getResources().getDrawable(R.drawable.seckey_icon_capital_default));
         safeKeyboard.setUpDrawable(this.getResources().getDrawable(R.drawable.seckey_icon_capital_selected));
