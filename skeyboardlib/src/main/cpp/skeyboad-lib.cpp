@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+#include <unordered_map>
 
 
 #include <openssl/hmac.h>
@@ -25,130 +26,133 @@ using namespace std;
 
 
 
-class HashNode {
-public:
-    string mKey;
-    string mValue;
-    HashNode *next;
+//class HashNode {
+//public:
+//    string mKey;
+//    string mValue;
+//    HashNode *next;
+//
+//    HashNode(string key, string value) {
+//        mKey = key;
+//        mValue = value;
+//        next = NULL;
+//    }
+//
+//    ~HashNode() {
+//    }
+//
+//    HashNode &operator=(const HashNode &node) {
+//        if (this == &node) return *this;
+//        mKey = node.mKey;
+//        mValue = node.mValue;
+//        next = node.next;
+//        return *this;
+//    }
+//};
+//
+//class HashMap {
+//public:
+//    HashMap(int size);
+//
+//    ~HashMap();
+//
+//    bool HMInsert(const string &key, const string &value);
+//
+//    bool HMDelete(const string &key);
+//
+//    string &HMFind(const string &key);
+//
+//    string &operator[](const string &key);
+//
+//private:
+//    int hashfunc(const string &key);
+//
+//    HashNode **mTable;
+//    int mSize;
+//    string strnull;
+//};
+//
+//HashMap::HashMap(int size) : mSize(size) {
+//    mTable = new HashNode *[size];
+//    for (int i = 0; i < mSize; ++i) {
+//        mTable[i] = NULL;
+//    }
+////    strnull = "NULL";
+//    strnull = "";
+//}
+//
+//HashMap::~HashMap() {
+//    for (int i = 0; i < mSize; ++i) {
+//        HashNode *curNode = mTable[i];
+//        while (curNode) {
+//            HashNode *temp = curNode;
+//            curNode = curNode->next;
+//            delete temp;
+//        }
+//    }
+//    delete mTable;
+//}
+//
+//HashMap hashmap(10);
+//
+//bool HashMap::HMInsert(const string &key, const string &value) {
+//    int index = hashfunc(key) % mSize;
+//    HashNode *node = new HashNode(key, value);
+//    node->next = mTable[index];
+//    mTable[index] = node;
+//    return true;
+//}
+//
+//bool HashMap::HMDelete(const string &key) {
+//    int index = hashfunc(key) % mSize;
+//    HashNode *node = mTable[index];
+//    HashNode *prev = NULL;
+//    while (node) {
+//        if (key == node->mKey) {
+//            if (NULL == prev) {
+//                mTable[index] = node->next;
+//            } else {
+//                prev->next = node->next;
+//            }
+//            delete node;
+//            return true;
+//        }
+//        prev = node;
+//        node = node->next;
+//    }
+//    return false;
+//}
+//
+//string &HashMap::HMFind(const string &key) {
+//    int index = hashfunc(key) % mSize;
+//    if (NULL == mTable[index]) {
+//        return strnull;
+//    } else {
+//        HashNode *node = mTable[index];
+//        while (node) {
+//            if (key == node->mKey) {
+//                return node->mValue;
+//            }
+//            node = node->next;
+//        }
+//    }
+//    return strnull;
+//}
+//
+//string &HashMap::operator[](const string &key) {
+//    return HMFind(key);
+//}
+//
+//int HashMap::hashfunc(const string &key) {
+//    int hash = 0;
+//    for (int i = 0; i < key.length(); ++i) {
+//        hash = hash << 7 ^ key[i];
+//    }
+//    return (hash & 0x7FFFFFFF);
+//}
 
-    HashNode(string key, string value) {
-        mKey = key;
-        mValue = value;
-        next = NULL;
-    }
 
-    ~HashNode() {
-    }
-
-    HashNode &operator=(const HashNode &node) {
-        if (this == &node) return *this;
-        mKey = node.mKey;
-        mValue = node.mValue;
-        next = node.next;
-        return *this;
-    }
-};
-
-class HashMap {
-public:
-    HashMap(int size);
-
-    ~HashMap();
-
-    bool HMInsert(const string &key, const string &value);
-
-    bool HMDelete(const string &key);
-
-    string &HMFind(const string &key);
-
-    string &operator[](const string &key);
-
-private:
-    int hashfunc(const string &key);
-
-    HashNode **mTable;
-    int mSize;
-    string strnull;
-};
-
-HashMap::HashMap(int size) : mSize(size) {
-    mTable = new HashNode *[size];
-    for (int i = 0; i < mSize; ++i) {
-        mTable[i] = NULL;
-    }
-//    strnull = "NULL";
-    strnull = "";
-}
-
-HashMap::~HashMap() {
-    for (int i = 0; i < mSize; ++i) {
-        HashNode *curNode = mTable[i];
-        while (curNode) {
-            HashNode *temp = curNode;
-            curNode = curNode->next;
-            delete temp;
-        }
-    }
-    delete mTable;
-}
-
-HashMap hashmap(10);
-
-bool HashMap::HMInsert(const string &key, const string &value) {
-    int index = hashfunc(key) % mSize;
-    HashNode *node = new HashNode(key, value);
-    node->next = mTable[index];
-    mTable[index] = node;
-    return true;
-}
-
-bool HashMap::HMDelete(const string &key) {
-    int index = hashfunc(key) % mSize;
-    HashNode *node = mTable[index];
-    HashNode *prev = NULL;
-    while (node) {
-        if (key == node->mKey) {
-            if (NULL == prev) {
-                mTable[index] = node->next;
-            } else {
-                prev->next = node->next;
-            }
-            delete node;
-            return true;
-        }
-        prev = node;
-        node = node->next;
-    }
-    return false;
-}
-
-string &HashMap::HMFind(const string &key) {
-    int index = hashfunc(key) % mSize;
-    if (NULL == mTable[index]) {
-        return strnull;
-    } else {
-        HashNode *node = mTable[index];
-        while (node) {
-            if (key == node->mKey) {
-                return node->mValue;
-            }
-            node = node->next;
-        }
-    }
-    return strnull;
-}
-
-string &HashMap::operator[](const string &key) {
-    return HMFind(key);
-}
-
-int HashMap::hashfunc(const string &key) {
-    int hash = 0;
-    for (int i = 0; i < key.length(); ++i) {
-        hash = hash << 7 ^ key[i];
-    }
-    return (hash & 0x7FFFFFFF);
-}
+unordered_map<string,string> hashmap;
 
 
 string jstring2str(JNIEnv *env, jstring jstr) {
@@ -184,8 +188,8 @@ Java_net_hyy_fun_skeyboardlib_NativeHelper_addKey(JNIEnv *env, jclass type, jstr
 
 //    LOGI("Native-lib addKey：%s",jstring2str(env, text_).c_str());
     // TODO
-    hashmap.HMInsert(jstring2str(env, id_),
-                     hashmap.HMFind(jstring2str(env, id_))+(jstring2str(env, text_)));
+    hashmap[jstring2str(env, id_)] =
+                     hashmap[jstring2str(env, id_)]+(jstring2str(env, text_));
 
 }
 
@@ -195,9 +199,9 @@ JNIEXPORT void JNICALL
 Java_net_hyy_fun_skeyboardlib_NativeHelper_deleteKey(JNIEnv *env, jclass type, jstring id_) {
 
     // TODO
-    string input = hashmap.HMFind(jstring2str(env, id_));
+    string input = hashmap[jstring2str(env, id_)];
     input.pop_back();
-    hashmap.HMInsert(jstring2str(env, id_), input);
+    hashmap[jstring2str(env, id_)] = input;
 
 }
 
@@ -206,9 +210,9 @@ JNIEXPORT void JNICALL
 Java_net_hyy_fun_skeyboardlib_NativeHelper_clearKey(JNIEnv *env, jclass type, jstring id_) {
 
     // TODO
-    string input = hashmap.HMFind(jstring2str(env, id_));
+    string input = hashmap[jstring2str(env, id_)];
     input.clear();
-    hashmap.HMInsert(jstring2str(env, id_), input);
+    hashmap[jstring2str(env, id_)] = input;
 
 }
 
@@ -220,7 +224,7 @@ Java_net_hyy_fun_skeyboardlib_NativeHelper_getEncryptKey(JNIEnv *env, jclass typ
 
 
     // TODO
-    string input = hashmap.HMFind(jstring2str(env, id_));
+    string input = hashmap.at(jstring2str(env, id_));
 
 
     if (input.empty()) {
@@ -252,7 +256,7 @@ Java_net_hyy_fun_skeyboardlib_NativeHelper_getDecryptKey(JNIEnv *env, jclass typ
 
 //    LOGI("Native-lib DecryptKey：%s",hashmap.HMFind(jstring2str(env, id_)).c_str());
     // TODO
-    return (env)->NewStringUTF(hashmap.HMFind(jstring2str(env, id_)).data());
+    return (env)->NewStringUTF(hashmap[jstring2str(env, id_)].data());
 }
 
 
@@ -406,7 +410,7 @@ Java_net_hyy_fun_skeyboardlib_NativeHelper_getEncryptKeyDES(JNIEnv *env, jclass 
     jbyte *key = env->GetByteArrayElements(key_, NULL);
 
 
-    string content = hashmap.HMFind(id);
+    string content = hashmap.at(id);
 
     if(content.empty()){
         env->ReleaseStringUTFChars(id_, id);
@@ -463,10 +467,11 @@ Java_net_hyy_fun_skeyboardlib_NativeHelper_releaseKey(JNIEnv *env, jclass type, 
     const char *id = env->GetStringUTFChars(id_, 0);
 
     // TODO
-    bool re = hashmap.HMDelete(id);
-    while(re){
-        re = hashmap.HMDelete(id);
-    }
+    hashmap.erase(id);
+//    bool re = hashmap.HMDelete(id);
+//    while(re){
+//        re = hashmap.HMDelete(id);
+//    }
 
     env->ReleaseStringUTFChars(id_, id);
 }
