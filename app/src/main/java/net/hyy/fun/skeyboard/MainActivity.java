@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     Button btn_getEncryptKeyDES;
     Button btn_openssl_aes;
     Button btn_test;
+    Button btn_release;
 
 
 
@@ -53,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
         btn_getEncryptKeyDES = findViewById(R.id.btn_getEncryptKeyDES);
         btn_openssl_aes = findViewById(R.id.btn_openssl_aes);
         btn_test = findViewById(R.id.btn_test);
+        btn_release = findViewById(R.id.btn_release);
+
 
         sample_text.setText(NativeHelper.stringFromJNI());
 
@@ -127,6 +130,14 @@ public class MainActivity extends AppCompatActivity {
                 String bas = android.util.Base64.encodeToString(test, android.util.Base64.DEFAULT);
                 Log.i(TAG,"Des加密结果：" + bas);
 
+            }
+        });
+
+
+        btn_release.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NativeHelper.releaseKey(DUMMY_ID);
             }
         });
 

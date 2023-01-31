@@ -608,6 +608,8 @@ public class SafeKeyboard {
                             }
                         } else {
                             ((EditText) v).setText("");
+                            //Fix 20230131 add clearKey
+                            NativeHelper.clearKey(String.valueOf(v.getId()));
                             if (!isKeyboardShown()) {
                                 getOriginalScrollLayoutPos();
                                 showHandler.removeCallbacks(showRun);
@@ -917,5 +919,13 @@ public class SafeKeyboard {
         }
 
         return true;
+    }
+
+    public void release(){
+        if(null != editTextList){
+            for (EditText et:editTextList){
+                NativeHelper.releaseKey(String.valueOf(et.getId()));
+            }
+        }
     }
 }

@@ -30,6 +30,8 @@ public class NativeHelper {
 
     public static native byte[] test(byte[] src);
 
+    public static final native void releaseKey(String id);
+
 
     // Used to load the 'native-lib' library on application startup.
     static {

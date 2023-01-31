@@ -25,8 +25,6 @@ using namespace std;
 
 
 
-
-
 class HashNode {
 public:
     string mKey;
@@ -187,7 +185,7 @@ Java_net_hyy_fun_skeyboardlib_NativeHelper_addKey(JNIEnv *env, jclass type, jstr
 //    LOGI("Native-lib addKey：%s",jstring2str(env, text_).c_str());
     // TODO
     hashmap.HMInsert(jstring2str(env, id_),
-                     hashmap.HMFind(jstring2str(env, id_)).append(jstring2str(env, text_)));
+                     hashmap.HMFind(jstring2str(env, id_))+(jstring2str(env, text_)));
 
 }
 
@@ -459,4 +457,16 @@ Java_net_hyy_fun_skeyboardlib_NativeHelper_getEncryptKeyDES(JNIEnv *env, jclass 
     env->ReleaseByteArrayElements(key_, key, 0);
 
     return cipher;
+}extern "C"
+JNIEXPORT void JNICALL
+Java_net_hyy_fun_skeyboardlib_NativeHelper_releaseKey(JNIEnv *env, jclass type, jstring id_) {
+    const char *id = env->GetStringUTFChars(id_, 0);
+
+    // TODO
+    bool re = hashmap.HMDelete(id);
+    while(re){
+        re = hashmap.HMDelete(id);
+    }
+
+    env->ReleaseStringUTFChars(id_, id);
 }
