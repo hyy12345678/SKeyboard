@@ -26,6 +26,10 @@ openssl分支在c++层使用openssl的加密库算法，实现真正意义的在
  editList.add(safeEdit3);
  safeKeyboard = new SafeKeyboard(MainActivity.this, keyboardContainer, editList,scroll_layout,
                 true, false, false, false);
+                
+ //onDestroy时调用release方法，确保C++层清除密码记录
+ safeKeyboard.release();
+ 
 ```
 - editList：需要用到安全键盘的EditText，可以添加进此List，
 - scroll_layout：目标 EditText 父布局 View
