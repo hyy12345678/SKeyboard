@@ -3,9 +3,11 @@ package net.hyy.fun.skeyboard;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -56,6 +58,42 @@ public class Main2Activity extends AppCompatActivity {
         editList.add(safeEdit);
         editList.add(safeEdit2);
         editList.add(safeEdit3);
+
+        final Button clck2 = findViewById(R.id.clear);
+        clck2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                safeEdit2.requestFocus();
+
+//                MotionEvent motionEventDown = MotionEvent.obtain(
+//                        SystemClock.uptimeMillis(),
+//                        SystemClock.uptimeMillis(),
+//                        MotionEvent.ACTION_DOWN,
+//                        100f,
+//                        100f,
+//                        0
+//                );
+//
+//                MotionEvent motionEventUp = MotionEvent.obtain(
+//                        SystemClock.uptimeMillis(),
+//                        SystemClock.uptimeMillis(),
+//                        MotionEvent.ACTION_UP,
+//                        100f,
+//                        100f,
+//                        0
+//                );
+//
+//                safeEdit2.dispatchTouchEvent(motionEventDown);
+//                safeEdit2.dispatchTouchEvent(motionEventUp);
+//
+//                motionEventDown.recycle();
+//                motionEventUp.recycle();
+
+                safeKeyboard.requestFocus(safeEdit2);
+
+            }
+        });
+
 
         final Button clck = findViewById(R.id.feed_back);
         clck.setOnClickListener(new View.OnClickListener() {

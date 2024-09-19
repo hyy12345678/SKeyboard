@@ -17,6 +17,12 @@
             android:layout_marginTop="250dp"
             android:orientation="vertical">
 
+            <Button
+                android:id="@+id/clear"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hapticFeedbackEnabled="true"
+                android:text="清除" />
 
             <Button
                 android:id="@+id/feed_back"

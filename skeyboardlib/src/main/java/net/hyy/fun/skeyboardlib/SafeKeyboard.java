@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
@@ -628,7 +629,7 @@ public class SafeKeyboard {
     }
 
     //隐藏系统键盘关键代码
-    private void hideSystemKeyBoard(EditText edit) {
+    private void hideSystemKeyBoard(final EditText edit) {
         this.mEditText = edit;
         InputMethodManager imm = (InputMethodManager) this.mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm == null) {
@@ -661,6 +662,19 @@ public class SafeKeyboard {
                 e.printStackTrace();
             }
         }
+
+        //补充强制禁止editTextPwd获取focus后弹出软键盘
+        edit.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (edit.hasFocus()) {
+                    InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm.isActive()) {
+                        imm.hideSoftInputFromWindow(edit.getWindowToken(), 0);
+                    }
+                }
+            }
+        });
     }
 
     private boolean isKeyboardShown() {
@@ -925,6 +939,38 @@ public class SafeKeyboard {
         if(null != editTextList){
             for (EditText et:editTextList){
                 NativeHelper.releaseKey(String.valueOf(et.getId()));
+            }
+            editTextList = null;
+        }
+    }
+
+    //通过模拟DOWN，UP事件代替requestFocus（放入skeyboard的EditText不允许直接requestFocus）
+    public void requestFocus(EditText editText){
+        if(null != editTextList){
+            if(editTextList.contains(editText)){
+                MotionEvent motionEventDown = MotionEvent.obtain(
+                        SystemClock.uptimeMillis(),
+                        SystemClock.uptimeMillis(),
+                        MotionEvent.ACTION_DOWN,
+                        100f,
+                        100f,
+                        0
+                );
+
+                MotionEvent motionEventUp = MotionEvent.obtain(
+                        SystemClock.uptimeMillis(),
+                        SystemClock.uptimeMillis(),
+                        MotionEvent.ACTION_UP,
+                        100f,
+                        100f,
+                        0
+                );
+
+                editText.dispatchTouchEvent(motionEventDown);
+                editText.dispatchTouchEvent(motionEventUp);
+
+                motionEventDown.recycle();
+                motionEventUp.recycle();
             }
         }
     }
