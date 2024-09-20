@@ -32,6 +32,7 @@ openssl分支在c++层使用openssl的加密库算法，实现真正意义的在
  
  //如果放入safeKeyboard中管理的EditText想要不通过点击主动获取Focus，
  // 不能直接使用editText.requestFocus方法，需要使用safeKeyboard提供的requestFocus(EditText)方法。
+ safeKeyboard.requestFocus(editText);
  
 ```
 - editList：需要用到安全键盘的EditText，可以添加进此List，
